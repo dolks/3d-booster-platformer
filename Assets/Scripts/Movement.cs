@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class Movement : MonoBehaviour
 {
     Rigidbody rocketRigidbody;
+    BoxCollider rocketBoxCollider;
     AudioSource rocketAudioSource;
     [SerializeField] AudioClip thrustSFX;
     [SerializeField] AudioClip crashSFX;
@@ -18,11 +20,13 @@ public class Movement : MonoBehaviour
     [SerializeField] float thrust = 10;
     [SerializeField] float rotationThrust = 200;
     bool isTransitioning = false;
+    bool isCollisionEnabled = true;
     // Start is called before the first frame update
     void Start()
     {
         rocketRigidbody = GetComponent<Rigidbody>();
         rocketAudioSource = GetComponent<AudioSource>();
+        rocketBoxCollider = GetComponent<BoxCollider>();
     }
 
     // Update is called once per frame
@@ -30,6 +34,28 @@ public class Movement : MonoBehaviour
     {
         ProcessRotation();
         ProcessThrust();
+        ProcessDebug();
+    }
+
+    private void ProcessDebug()
+    {
+        if (Input.GetKey(KeyCode.L))
+        {
+            ReloadLevel();
+        } else if (Input.GetKey(KeyCode.C))
+        {
+            isCollisionEnabled = !isCollisionEnabled;
+            toggleCollision(isCollisionEnabled);
+        }
+    }
+
+    private void toggleCollision(bool isCollisionEnabled)
+    {
+        rocketBoxCollider.enabled = isCollisionEnabled;
+        foreach (Collider collider in GetComponentsInChildren<Collider>())
+        {
+            collider.enabled = isCollisionEnabled;
+        }
     }
 
     void ProcessThrust()
